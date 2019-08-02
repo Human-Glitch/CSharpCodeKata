@@ -1,109 +1,128 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProviderQuality.Console
 {
     public class Program
     {
-        public IList<Award> Awards
+        private enum AwardName
         {
-            get;
-            set;
+            GovQualityPlus,
+            BlueFirst,
+            AcmePartnerFacility,
+            BlueDistinctionPlus,
+            BlueCompare,
+            TopConnectedProviders
         }
+
+        readonly static Dictionary<AwardName, string> AwardNames = new Dictionary<AwardName, string>
+        {
+            { AwardName.GovQualityPlus, "Gov Quality Plus" },
+            { AwardName.BlueFirst, "Blue First"},
+            { AwardName.AcmePartnerFacility, "ACME Partner Facility" },
+            { AwardName.BlueDistinctionPlus, "Blue Distrinction Plus" },
+            { AwardName.BlueCompare, "Blue Compare" },
+            { AwardName.TopConnectedProviders, "Top Connected Providers" }
+        };
+
+        public IList<Award> Awards { get; set; } = new List<Award>
+        {
+            new Award { Name = AwardNames[AwardName.GovQualityPlus], SellIn = 10, Quality = 20 },
+            new Award { Name = AwardNames[AwardName.BlueFirst], SellIn = 2, Quality = 0 },
+            new Award { Name = AwardNames[AwardName.AcmePartnerFacility], SellIn = 5, Quality = 7 },
+            new Award { Name = AwardNames[AwardName.BlueDistinctionPlus], SellIn = 0, Quality = 80 },
+            new Award { Name = AwardNames[AwardName.BlueCompare], SellIn = 15, Quality = 20 },
+            new Award { Name = AwardNames[AwardName.TopConnectedProviders], SellIn = 3, Quality = 6 }
+        };
 
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Updating award metrics...!");
-
-            var app = new Program()
+            try
             {
-                Awards = new List<Award>
-                {
-                    new Award {Name = "Gov Quality Plus", SellIn = 10, Quality = 20},
-                    new Award {Name = "Blue First", SellIn = 2, Quality = 0},
-                    new Award {Name = "ACME Partner Facility", SellIn = 5, Quality = 7},
-                    new Award {Name = "Blue Distinction Plus", SellIn = 0, Quality = 80},
-                    new Award {Name = "Blue Compare", SellIn = 15, Quality = 20},
-                    new Award {Name = "Top Connected Providres", SellIn = 3, Quality = 6}
-                }
+                System.Console.WriteLine("Updating award metrics...!");
 
-            };
+                Program app = new Program();
+                app.UpdateQuality();
 
-            app.UpdateQuality();
-
-            System.Console.ReadKey();
-
+                System.Console.ReadKey();
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"Failed to update award metrics. {ex.Message}");
+                System.Console.ReadKey();
+            }
         }
 
         public void UpdateQuality()
         {
-            for (var i = 0; i < Awards.Count; i++)
+            foreach (Award award in Awards)
             {
-                if (Awards[i].Name != "Blue First" && Awards[i].Name != "Blue Compare")
+                if (award.Name != AwardNames[AwardName.BlueFirst] && award.Name != AwardNames[AwardName.BlueCompare])
                 {
-                    if (Awards[i].Quality > 0)
+                    if (award.Quality > 0)
                     {
-                        if (Awards[i].Name != "Blue Distinction Plus")
+                        if (award.Name != AwardNames[AwardName.BlueDistinctionPlus])
                         {
-                            Awards[i].Quality = Awards[i].Quality - 1;
+                            award.Quality = award.Quality - 1;
                         }
                     }
                 }
                 else
                 {
-                    if (Awards[i].Quality < 50)
+                    if (award.Quality < 50)
                     {
-                        Awards[i].Quality = Awards[i].Quality + 1;
+                        award.Quality = award.Quality + 1;
 
-                        if (Awards[i].Name == "Blue Compare")
+                        if (award.Name == AwardNames[AwardName.BlueCompare])
                         {
-                            if (Awards[i].SellIn < 11)
+                            if (award.SellIn < 11)
                             {
-                                if (Awards[i].Quality < 50)
+                                if (award.Quality < 50)
                                 {
-                                    Awards[i].Quality = Awards[i].Quality + 1;
+                                    award.Quality = award.Quality + 1;
                                 }
                             }
 
-                            if (Awards[i].SellIn < 6)
+                            if (award.SellIn < 6)
                             {
-                                if (Awards[i].Quality < 50)
+                                if (award.Quality < 50)
                                 {
-                                    Awards[i].Quality = Awards[i].Quality + 1;
+                                    award.Quality = award.Quality + 1;
                                 }
                             }
                         }
                     }
                 }
 
-                if (Awards[i].Name != "Blue Distinction Plus")
+                if (award.Name != AwardNames[AwardName.BlueDistinctionPlus])
                 {
-                    Awards[i].SellIn = Awards[i].SellIn - 1;
+                    award.SellIn = award.SellIn - 1;
                 }
 
-                if (Awards[i].SellIn < 0)
+                if (award.SellIn < 0)
                 {
-                    if (Awards[i].Name != "Blue First")
+                    if (award.Name != AwardNames[AwardName.BlueFirst])
                     {
-                        if (Awards[i].Name != "Blue Compare")
+                        if (award.Name != AwardNames[AwardName.BlueCompare])
                         {
-                            if (Awards[i].Quality > 0)
+                            if (award.Quality > 0)
                             {
-                                if (Awards[i].Name != "Blue Distinction Plus")
+                                if (award.Name != AwardNames[AwardName.BlueDistinctionPlus])
                                 {
-                                    Awards[i].Quality = Awards[i].Quality - 1;
+                                    award.Quality = award.Quality - 1;
                                 }
                             }
                         }
                         else
                         {
-                            Awards[i].Quality = Awards[i].Quality - Awards[i].Quality;
+                            award.Quality = award.Quality - award.Quality;
                         }
                     }
                     else
                     {
-                        if (Awards[i].Quality < 50)
+                        if (award.Quality < 50)
                         {
-                            Awards[i].Quality = Awards[i].Quality + 1;
+                            award.Quality = award.Quality + 1;
                         }
                     }
                 }
