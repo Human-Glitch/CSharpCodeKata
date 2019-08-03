@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ProviderQuality.Console
@@ -12,28 +12,32 @@ namespace ProviderQuality.Console
         private const string BlueCompare = "Blue Compare";
         private const string TopConnectedProviders = "Top Connected Providers";
 
-        public static IList<Award> Awards { get; set; } = new List<Award>
-        {
-            new Award { Name = GovQualityPlus, SellIn = 10, Quality = 20 },
-            new Award { Name = BlueFirst, SellIn = 2, Quality = 0 },
-            new Award { Name = AcmePartnerFacility, SellIn = 5, Quality = 7 },
-            new Award { Name = BlueDistinctionPlus, SellIn = 0, Quality = 80 },
-            new Award { Name = BlueCompare, SellIn = 15, Quality = 20 },
-            new Award { Name = TopConnectedProviders, SellIn = 3, Quality = 6 }
-        };
+        public IList<Award> Awards { get; set; } = new List<Award>();
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
-                System.Console.WriteLine("Updating award metrics...!");
-                PrintAwards();
+                Program app = new Program
+                {
+                    Awards = new List<Award>
+                    {
+                        new Award {Name = GovQualityPlus, SellIn = 10, Quality = 20},
+                        new Award {Name = BlueFirst, SellIn = 2, Quality = 0},
+                        new Award {Name = AcmePartnerFacility, SellIn = 5, Quality = 7},
+                        new Award {Name = BlueDistinctionPlus, SellIn = 0, Quality = 80},
+                        new Award {Name = BlueCompare, SellIn = 15, Quality = 20},
+                        new Award {Name = TopConnectedProviders, SellIn = 3, Quality = 6},
+                    }
+                };
 
-                Program app = new Program();
+                System.Console.WriteLine("Updating award metrics...!");
+                PrintAwards(app.Awards);
+
                 app.UpdateQuality();
 
                 System.Console.WriteLine("Successfully updated award metrics!");
-                PrintAwards();
+                PrintAwards(app.Awards);
 
                 System.Console.ReadKey();
             }
@@ -44,9 +48,9 @@ namespace ProviderQuality.Console
             }
         }
 
-        private static void PrintAwards()
+        private static void PrintAwards(IList<Award> awards)
         {
-            foreach (Award award in Awards)
+            foreach (Award award in awards)
                 System.Console.WriteLine($"Award Name: {award.Name}, Award Sell In: {award.SellIn}, Award Quality: {award.Quality}");
         }
 
@@ -56,6 +60,7 @@ namespace ProviderQuality.Console
             {
                 CalculateInitialAwardQuality(award);
                 DecrementAwardSellIn(award);
+
                 if (award.SellIn >= 0) continue;
                 CalculatePostAwardQuality(award);
             }
@@ -67,7 +72,6 @@ namespace ProviderQuality.Console
             {
                 case BlueFirst:
                     IncrementAwardQuality(award);
-
                     break;
 
                 case BlueCompare:
@@ -75,7 +79,6 @@ namespace ProviderQuality.Console
 
                     if (award.SellIn < 11) IncrementAwardQuality(award);
                     if (award.SellIn < 6) IncrementAwardQuality(award);
-
                     break;
 
                 default:
