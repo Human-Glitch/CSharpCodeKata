@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ProviderQuality.Console
@@ -11,6 +11,12 @@ namespace ProviderQuality.Console
         private const string BlueDistinctionPlus = "Blue Distinction Plus";
         private const string BlueCompare = "Blue Compare";
         private const string TopConnectedProviders = "Top Connected Providers";
+        private const string BlueStar = "Blue Star";
+
+        private const int BlueStarQualityLossMultiplier = 2;
+        private const int MaxAwardQuality = 50;
+        private const int FirstSellInThreshold = 10;
+        private const int SecondSellInThreshold = 5;
 
         public IList<Award> Awards { get; set; } = new List<Award>();
 
@@ -28,6 +34,7 @@ namespace ProviderQuality.Console
                         new Award {Name = BlueDistinctionPlus, SellIn = 0, Quality = 80},
                         new Award {Name = BlueCompare, SellIn = 15, Quality = 20},
                         new Award {Name = TopConnectedProviders, SellIn = 3, Quality = 6},
+                        new Award {Name = BlueStar, SellIn = 0, Quality = 30}
                     }
                 };
 
@@ -51,7 +58,9 @@ namespace ProviderQuality.Console
         private static void PrintAwards(IList<Award> awards)
         {
             foreach (Award award in awards)
-                System.Console.WriteLine($"Award Name: {award.Name}, Award Sell In: {award.SellIn}, Award Quality: {award.Quality}");
+                System.Console.WriteLine($"Award Name: {award.Name}, Award SellIn: {award.SellIn}, Award Quality: {award.Quality}");
+
+            System.Console.WriteLine();
         }
 
         public void UpdateQuality()
@@ -59,7 +68,7 @@ namespace ProviderQuality.Console
             foreach (Award award in Awards)
             {
                 CalculateInitialAwardQuality(award);
-                DecrementAwardSellIn(award);
+                ReduceAwardSellIn(award);
 
                 if (award.SellIn >= 0) continue;
                 CalculatePostAwardQuality(award);
@@ -71,18 +80,22 @@ namespace ProviderQuality.Console
             switch (award.Name)
             {
                 case BlueFirst:
-                    IncrementAwardQuality(award);
+                    GainAwardQuality(award);
                     break;
 
                 case BlueCompare:
-                    IncrementAwardQuality(award);
+                    GainAwardQuality(award);
 
-                    if (award.SellIn < 11) IncrementAwardQuality(award);
-                    if (award.SellIn < 6) IncrementAwardQuality(award);
+                    if (award.SellIn <= FirstSellInThreshold) GainAwardQuality(award);
+                    if (award.SellIn <= SecondSellInThreshold) GainAwardQuality(award);
+                    break;
+
+                case BlueStar:
+                    LoseBlueStarAwardQuality(award);
                     break;
 
                 default:
-                    DecrementAwardQuality(award);
+                    LoseAwardQuality(award);
                     break;
             }
         }
@@ -92,32 +105,46 @@ namespace ProviderQuality.Console
             switch (award.Name)
             {
                 case BlueFirst:
-                    IncrementAwardQuality(award);
+                    GainAwardQuality(award);
                     break;
 
                 case BlueCompare:
                     award.Quality = 0;
                     break;
 
+                case BlueStar:
+                    LoseBlueStarAwardQuality(award);
+                    break;
+
                 default:
-                    DecrementAwardQuality(award);
+                    LoseAwardQuality(award);
                     break;
             }
         }
 
-        private static void DecrementAwardSellIn(Award award)
+        private static void LoseBlueStarAwardQuality(Award award)
+        {
+            int count = 0;
+            while (count < BlueStarQualityLossMultiplier)
+            {
+                LoseAwardQuality(award);
+                count++;
+            }
+        }
+
+        private static void ReduceAwardSellIn(Award award)
         {
             if (award.Name != BlueDistinctionPlus) award.SellIn -= 1;
         }
 
-        private static void DecrementAwardQuality(Award award)
+        private static void LoseAwardQuality(Award award)
         {
             if (award.Name != BlueDistinctionPlus && award.Quality > 0) award.Quality -= 1;
         }
 
-        private static void IncrementAwardQuality(Award award)
+        private static void GainAwardQuality(Award award)
         {
-            if (award.Quality < 50) award.Quality += 1;
+            if (award.Quality < MaxAwardQuality) award.Quality += 1;
         }
     }
 }
