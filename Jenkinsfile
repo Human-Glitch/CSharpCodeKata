@@ -7,10 +7,7 @@ pipeline
 		{
             steps 
 			{
-                withMaven(maven: 'maven_3_5_0')
-				{
-					echo 'build'
-				}
+				echo 'build'
             }
         }
 
@@ -18,10 +15,7 @@ pipeline
 		{
 			steps 
 			{
-				withMaven(maven: 'maven_3_5_0')
-				{
-					echo 'deploy'
-				}
+				echo 'deploy'
 			}
 			
 		}
