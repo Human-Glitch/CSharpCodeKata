@@ -9,7 +9,7 @@ pipeline
 			{
                 withMaven(maven: 'maven_3_5_0')
 				{
-					sh 'mvn clean compile'
+					echo 'build'
 				}
             }
         }
@@ -20,7 +20,7 @@ pipeline
 			{
 				withMaven(maven: 'maven_3_5_0')
 				{
-					sh 'mvn deploy'
+					echo 'deploy'
 				}
 			}
 			
